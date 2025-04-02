@@ -9,9 +9,10 @@ data class Roles (
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String = "",
     @Enumerated
-    val role: Role
+    val role: RoleEnum
+
 )
 
-enum class Role{
+enum class RoleEnum{
     ADMIN, USER
 }

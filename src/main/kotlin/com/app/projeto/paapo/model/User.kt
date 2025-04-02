@@ -13,6 +13,10 @@ data class User(
     @NotBlank
     val userName: String = "",
     @NotBlank
+    val firstName: String = "",
+    @NotBlank
+    val lastName: String = "",
+    @NotBlank
     @Email
     val email: String = "",
     @NotBlank
@@ -21,5 +25,5 @@ data class User(
     @JoinTable(name = "user_roles",
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "role_id")])
-    val roles: Set<Role> = HashSet()
+    val roles: Set<Roles> = HashSet()
 )
