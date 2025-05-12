@@ -1,4 +1,4 @@
-package models
+package healthinformation
 
 type HealthInformation struct {
 	Weight                    float64 `json:"weight"`
@@ -8,5 +8,4 @@ type HealthInformation struct {
 	PhysicalActivityFrequency string  `json:"physical_activity_frequency"`
 	PhysicalActivityType      string  `json:"physical_activity_type"`
 	UserID                    string  `gorm:"uniqueIndex" json:"user_id"`
-	User                      *User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"-"`
 }
