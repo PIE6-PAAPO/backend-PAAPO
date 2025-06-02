@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	healthinfo "backend-PAAPO/internal/HealthInformation"
+	medicaldata "backend-PAAPO/internal/MedicalData"
 	"backend-PAAPO/internal/users"
 
 	"gorm.io/driver/postgres"
@@ -36,7 +38,12 @@ func ConnectDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	if err := db.AutoMigrate(&users.User{}); err != nil {
+	// Migrate all models
+	if err := db.AutoMigrate(
+		&users.User{},
+		&healthinfo.HealthInformation{},
+		&medicaldata.MedicalData{},
+	); err != nil {
 		return nil, fmt.Errorf("migration failed: %w", err)
 	}
 
