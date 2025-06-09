@@ -18,3 +18,14 @@ type RegisterDTO struct {
 	Password  string `json:"password" binding:"required,min=8"`
 	CoverUrl  string `json:"cover_url" binding:"required"`
 }
+
+type ForgotPasswordDTO struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type ResetPasswordDTO struct {
+	Email           string `json:"email" binding:"required,email"`
+	Code            string `json:"code" binding:"required,len=6"`
+	NewPassword     string `json:"new_password" binding:"required,min=8"`
+	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=NewPassword"`
+}

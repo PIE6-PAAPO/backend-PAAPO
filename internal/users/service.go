@@ -1,8 +1,10 @@
 package users
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
+	"math/big"
 	"os"
 	"regexp"
 	"time"
@@ -11,9 +13,11 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	mailjet "github.com/mailjet/mailjet-apiv3-go/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Service é a interface que define os métodos do serviço de usuários
 type Service struct {
 	db Repository
 }
@@ -93,11 +97,6 @@ func GenerateJWT(userID uuid.UUID, role string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-func (s *Service) CreateSession(userID uuid.UUID) (string, error) {
-	sessionID := uuid.New().String()
-	return sessionID, nil
-}
-
 func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
 	if user.Email == "" || user.Password == "" {
 		return nil, errors.New("email e senha são obrigatórios")
@@ -142,4 +141,139 @@ func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
 	}
 
 	return newUser, nil
+}
+
+// gera um código de 6 dígitos para recuperação de senha
+func gerarCodigoRecuperacao() (string, error) {
+	numeros := "0123456789"
+	codigo := make([]byte, 6)
+
+	for i := range codigo {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(numeros))))
+		if err != nil {
+			return "", err
+		}
+		codigo[i] = numeros[num.Int64()]
+	}
+	return string(codigo), nil
+}
+
+// SolicitarRecuperacaoSenha inicia o processo de recuperação de senha
+func (s *Service) SolicitarRecuperacaoSenha(email string) error {
+	// Verifica se o email é válido
+	if email == "" {
+		return nil
+	}
+
+	// Busca o usuário pelo email
+	usuario, err := s.db.GetByEmail(email)
+	if err != nil {
+		// Se não achar o usuário, não retorna erro (por segurança)
+		return nil
+	}
+
+	// Gera um código de 6 dígitos
+	codigo, err := gerarCodigoRecuperacao()
+	if err != nil {
+		return fmt.Errorf("erro ao gerar código: %v", err)
+	}
+
+	// Define que o código expira em 1 hora
+	expiraEm := time.Now().Add(1 * time.Hour)
+	usuario.RecoveryCode = &codigo
+	usuario.RecoveryCodeExpiresAt = &expiraEm
+
+	// Salva o código no banco
+	if _, err := s.db.Update(usuario); err != nil {
+		return fmt.Errorf("erro ao salvar código: %v", err)
+	}
+
+	// Envia o email com o código
+	if err := enviarEmailRecuperacao(email, codigo); err != nil {
+		return fmt.Errorf("erro ao enviar email: %v", err)
+	}
+
+	return nil
+}
+
+// enviarEmailRecuperacao envia um email com o código de recuperação
+func enviarEmailRecuperacao(email, codigo string) error {
+	// Cria o cliente do Mailjet
+	mailjetClient := mailjet.NewMailjetClient(
+		os.Getenv("MJ_APIKEY_PUBLIC"),
+		os.Getenv("MJ_APIKEY_PRIVATE"),
+	)
+
+	// Monta a mensagem
+	messagesInfo := []mailjet.InfoMessagesV31{
+		{
+			From: &mailjet.RecipientV31{
+				Email: "naoresponda@paapo.com.br",
+				Name:  "PAAPO",
+			},
+			To: &mailjet.RecipientsV31{
+				mailjet.RecipientV31{
+					Email: email,
+				},
+			},
+			Subject:  "Redefinição de Senha - PAAPO",
+			TextPart: fmt.Sprintf("Seu código de recuperação é: %s", codigo),
+			HTMLPart: fmt.Sprintf(`
+				<h2>Redefinição de Senha</h2>
+				<p>Olá,</p>
+				<p>Recebemos uma solicitação para redefinir sua senha. Use o código abaixo para continuar:</p>
+				<div style="font-size: 24px; font-weight: bold; letter-spacing: 5px; margin: 20px 0; padding: 15px; background: #f5f5f5; display: inline-block; border-radius: 5px;">%s</div>
+				<p>Este código é válido por 1 hora. Se você não solicitou esta alteração, por favor, ignore este email.</p>
+				<p>Atenciosamente,<br>Equipe PAAPO</p>
+			`, codigo),
+		},
+	}
+
+	// Envia o email
+	messages := mailjet.MessagesV31{Info: messagesInfo}
+	_, err := mailjetClient.SendMailV31(&messages)
+	return err
+}
+
+// ConfirmarTrocaSenha confirma a troca de senha com o código de recuperação
+func (s *Service) ConfirmarTrocaSenha(email, codigo, novaSenha string) error {
+	// Valida os parâmetros
+	if email == "" || codigo == "" || novaSenha == "" {
+		return errors.New("dados inválidos")
+	}
+
+	// Busca o usuário pelo email
+	usuario, err := s.db.GetByEmail(email)
+	if err != nil {
+		// Se não achar, não fala que não existe (por segurança)
+		return errors.New("código inválido ou expirado")
+	}
+
+	// Verifica se o código está correto
+	if usuario.RecoveryCode == nil || *usuario.RecoveryCode != codigo {
+		return errors.New("código inválido ou expirado")
+	}
+
+	// Verifica se o código não expirou
+	if usuario.RecoveryCodeExpiresAt == nil || usuario.RecoveryCodeExpiresAt.Before(time.Now()) {
+		return errors.New("código expirado")
+	}
+
+	// Gera o hash da nova senha
+	hash, err := bcrypt.GenerateFromPassword([]byte(novaSenha), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.New("erro ao gerar hash da senha")
+	}
+
+	// Atualiza a senha e limpa o código de recuperação
+	usuario.Password = string(hash)
+	usuario.RecoveryCode = nil
+	usuario.RecoveryCodeExpiresAt = nil
+
+	// Salva as alterações
+	if _, err := s.db.Update(usuario); err != nil {
+		return errors.New("erro ao atualizar senha")
+	}
+
+	return nil
 }
