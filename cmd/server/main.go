@@ -2,10 +2,12 @@ package main
 
 import (
 	"log"
+	"os"
 
 	healthinfo "backend-PAAPO/internal/HealthInformation"
 	medicaldata "backend-PAAPO/internal/MedicalData"
 	"backend-PAAPO/internal/users"
+	"backend-PAAPO/routes/middleware"
 	"backend-PAAPO/pkg/database"
 
 	"github.com/gin-gonic/gin"
@@ -13,9 +15,24 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println(".env file not found, using defaults")
+	// Load environment variables from .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found, using system environment variables")
+	}
+
+	// Check for required environment variables
+	requiredVars := []string{"JWT_SECRET", "DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME"}
+	for _, v := range requiredVars {
+		if os.Getenv(v) == "" {
+			log.Fatalf("Required environment variable %s is not set", v)
+		}
+	}
+
+	// Log JWT secret info (don't log the actual secret in production)
+	jwtSecret := os.Getenv("JWT_SECRET")
+	log.Printf("JWT secret length: %d characters", len(jwtSecret))
+	if len(jwtSecret) < 32 {
+		log.Println("WARNING: JWT secret is shorter than recommended 32 characters")
 	}
 
 	db, err := database.ConnectDB()
@@ -36,16 +53,22 @@ func main() {
 
 	router := gin.Default()
 
+	// API v1 routes
 	api := router.Group("/api/v1")
-	{
-		// User authentication routes
-		users.UserRoutes(api, userService)
+	
+	// Public routes (no auth required)
+	authGroup := api.Group("/auth")
+	users.UserRoutes(authGroup, userService)
 
+	// Protected routes (require JWT auth)
+	protected := api.Group("")
+	protected.Use(middleware.AuthMiddleware())
+	{
 		// Health Information routes
-		healthInfoHandler.RegisterRoutes(api)
+		healthInfoHandler.RegisterRoutes(protected)
 
 		// Medical Data routes
-		medicalDataHandler.RegisterRoutes(api)
+		medicalDataHandler.RegisterRoutes(protected)
 	}
 
 	if err := router.Run(":8080"); err != nil {

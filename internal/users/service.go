@@ -1,9 +1,11 @@
 package users
 
 import (
+	"backend-PAAPO/internal/models"
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"os"
 	"regexp"
@@ -84,7 +86,14 @@ func ComparePasswordAndHash(password, hash string) (bool, error) {
 	return true, nil
 }
 
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+// getJWTSecret loads the JWT secret at runtime
+func getJWTSecret() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Fatal("JWT_SECRET environment variable not set")
+	}
+	return []byte(secret)
+}
 
 func GenerateJWT(userID uuid.UUID, role string) (string, error) {
 	claims := jwt.MapClaims{
@@ -94,7 +103,7 @@ func GenerateJWT(userID uuid.UUID, role string) (string, error) {
 		"iat":  time.Now().Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString(getJWTSecret())
 }
 
 func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
@@ -129,6 +138,7 @@ func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
 		LastName:      user.LastName,
 		Email:         user.Email,
 		Password:      string(hashedPassword),
+		Role:          string(models.Patient), // Default role
 		IsActive:      true,
 		IsConfirmed:   false,
 		LastUsedEmail: user.Email,

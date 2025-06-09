@@ -8,12 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type Role string
-
-const (
-	Admin   Role = "admin"
-	Patient Role = "patient"
-)
+// Role is now defined in the models package
 
 type User struct {
 	ID                        uuid.UUID `gorm:"type:uuid;primaryKey;"`

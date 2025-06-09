@@ -8,8 +8,7 @@ import (
 )
 
 func UserRoutes(r *gin.RouterGroup, service *Service) {
-	auth := r.Group("/auth")
-	auth.POST("/login", func(c *gin.Context) {
+	r.POST("/login", func(c *gin.Context) {
 		var loginDTO dto.LoginDTO
 		if err := c.ShouldBindJSON(&loginDTO); err != nil {
 			c.JSON(400, gin.H{"error": "Invalid input"})
@@ -33,7 +32,7 @@ func UserRoutes(r *gin.RouterGroup, service *Service) {
 		})
 	})
 
-	auth.POST("/register", func(c *gin.Context) {
+	r.POST("/register", func(c *gin.Context) {
 		var registerDTO dto.RegisterDTO
 		if err := c.ShouldBindJSON(&registerDTO); err != nil {
 			c.JSON(400, gin.H{"error": "Invalid input"})
@@ -58,7 +57,7 @@ func UserRoutes(r *gin.RouterGroup, service *Service) {
 	})
 
 	// Rota para solicitar recuperação de senha
-	auth.POST("/forgot-password", func(c *gin.Context) {
+	r.POST("/forgot-password", func(c *gin.Context) {
 		// Pega o email do corpo da requisição
 		var req dto.ForgotPasswordDTO
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -80,7 +79,7 @@ func UserRoutes(r *gin.RouterGroup, service *Service) {
 	})
 
 	// Rota para resetar a senha com o código de recuperação
-	auth.POST("/reset-password", func(c *gin.Context) {
+	r.POST("/reset-password", func(c *gin.Context) {
 		// Pega os dados do corpo da requisição
 		var req dto.ResetPasswordDTO
 		if err := c.ShouldBindJSON(&req); err != nil {
