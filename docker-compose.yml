@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  backend:
+    container_name: paapo-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=paapo
+      - JWT_SECRET=supersecretkey
+      - MJ_APIKEY_PUBLIC=your_mailjet_public_key
+      - MJ_APIKEY_PRIVATE=your_mailjet_private_key
+    volumes:
+      - .:/app
+    networks:
+      - paapo-network
+
+  db:
+    image: postgres:15
+    container_name: paapo-db
+    restart: always
+    environment:
+      POSTGRES_DB: paapo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - paapo-network
+
+volumes:
+  postgres_data:
+
+networks:
+  paapo-network:
+    driver: bridge
