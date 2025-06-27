@@ -121,6 +121,21 @@ func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
 	}
 
 	// Criação do usuário
+	// Conta quantos usuários há em cada grupo
+	testCount, err := s.db.CountByTestGroup(true)
+	if err != nil {
+		return nil, errors.New("erro ao contar grupo de teste")
+	}
+
+	controlCount, err := s.db.CountByTestGroup(false)
+	if err != nil {
+		return nil, errors.New("erro ao contar grupo de controle")
+	}
+
+	// Atribuição automática ao grupo
+	isTestGroup := controlCount > testCount
+
+	// Criação do usuário
 	newUser := &User{
 		ID:            uuid.New(),
 		CreatedAt:     time.Now(),
@@ -132,6 +147,7 @@ func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
 		IsActive:      true,
 		IsConfirmed:   false,
 		LastUsedEmail: user.Email,
+		IsTestGroup:   isTestGroup, // Aqui!
 	}
 
 	// Salvar no repositório
@@ -276,4 +292,14 @@ func (s *Service) ConfirmarTrocaSenha(email, codigo, novaSenha string) error {
 	}
 
 	return nil
+}
+
+func CreateUserWithGroupAssignment(repo Repository, user *User) (*User, error) {
+	testCount, _ := repo.CountByTestGroup(true)
+	controlCount, _ := repo.CountByTestGroup(false)
+
+	// Alternate automatically
+	user.IsTestGroup = controlCount > testCount
+
+	return repo.Create(user)
 }
