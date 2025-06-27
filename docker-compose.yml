@@ -19,8 +19,6 @@ services:
       - JWT_SECRET=supersecretkey
       - MJ_APIKEY_PUBLIC=your_mailjet_public_key
       - MJ_APIKEY_PRIVATE=your_mailjet_private_key
-    volumes:
-      - .:/app
     networks:
       - paapo-network
 

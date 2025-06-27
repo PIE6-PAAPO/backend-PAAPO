@@ -1,17 +1,30 @@
-FROM golang:1.22-alpine
+# Etapa 1: Build
+FROM golang:1.22-alpine AS builder
+
+ENV GOTOOLCHAIN=auto
 
 WORKDIR /app
 
-COPY go.mod ./go.mod
-COPY go.sum ./go.sum
-
+# Copiar arquivos de dependência primeiro (cache de camadas)
+COPY go.mod go.sum ./
 RUN go mod download
 
+# Copiar o restante da aplicação
 COPY . .
 
-RUN go build -o main .
-RUN go run cmd/server/main.go
+# Compilar o binário
+RUN go build -o main ./cmd/server
 
+# Etapa 2: Runtime
+FROM alpine:3.20
+
+WORKDIR /app
+
+# Copiar apenas o binário da etapa anterior
+COPY --from=builder /app/main .
+
+# Expor a porta do servidor
 EXPOSE 8080
 
+# Comando padrão
 CMD ["./main"]
