@@ -1,0 +1,27 @@
+# Ignorar controle de versão e configurações locais
+.git
+.idea
+*.iml
+
+# Ignorar arquivos de ambiente e configuração
+.env
+
+# Ignorar arquivos temporários, cache e logs
+*.log
+tmp/
+*.tmp
+*.swp
+
+# Ignorar testes (se houver)
+**/*_test.go
+
+# Ignorar arquivos/documentos não usados na build
+README.md
+requisitos.txt
+docker-compose.yml
+Dockerfile
+dockerignore
+
+# Ignorar arquivos de sistema operacional
+.DS_Store
+Thumbs.db

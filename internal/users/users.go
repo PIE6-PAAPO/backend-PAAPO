@@ -18,6 +18,7 @@ type User struct {
 	FirstName                 string         `gorm:"type:varchar(255);not null"`
 	LastName                  string         `gorm:"type:varchar(255);not null"`
 	Email                     string         `gorm:"type:varchar(255);not null;unique"`
+	IsTestGroup               bool           `gorm:"column:is_test_group"`
 	Password                  string         `gorm:"type:varchar(255);not null"`
 	Role                      string         `gorm:"type:varchar(255);not null"`
 	IsActive                  bool           `gorm:"not null;default:true"`
