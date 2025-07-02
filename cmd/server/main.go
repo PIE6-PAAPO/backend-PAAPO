@@ -2,11 +2,15 @@ package main
 
 import (
 	"log"
+	"os"
+
 	"time"
+
 
 	healthinfo "backend-PAAPO/internal/HealthInformation"
 	medicaldata "backend-PAAPO/internal/MedicalData"
 	"backend-PAAPO/internal/users"
+	"backend-PAAPO/routes/middleware"
 	"backend-PAAPO/pkg/database"
 
 	"github.com/gin-contrib/cors"
@@ -15,9 +19,24 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println(".env file not found, using defaults")
+	// Load environment variables from .env file
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found, using system environment variables")
+	}
+
+	// Check for required environment variables
+	requiredVars := []string{"JWT_SECRET", "DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME"}
+	for _, v := range requiredVars {
+		if os.Getenv(v) == "" {
+			log.Fatalf("Required environment variable %s is not set", v)
+		}
+	}
+
+	// Log JWT secret info (don't log the actual secret in production)
+	jwtSecret := os.Getenv("JWT_SECRET")
+	log.Printf("JWT secret length: %d characters", len(jwtSecret))
+	if len(jwtSecret) < 32 {
+		log.Println("WARNING: JWT secret is shorter than recommended 32 characters")
 	}
 
 	db, err := database.ConnectDB()
@@ -40,7 +59,24 @@ func main() {
 	// Cria o router Gin com configurações padrão
 	router := gin.Default()
 
-	// Middleware de CORS (dev: liberar todas origens)
+	// API v1 routes
+	api := router.Group("/api/v1")
+	
+	// Public routes (no auth required)
+	authGroup := api.Group("/auth")
+	users.UserRoutes(authGroup, userService)
+
+	// Protected routes (require JWT auth)
+	protected := api.Group("")
+	protected.Use(middleware.AuthMiddleware())
+	{
+		// Health Information routes
+		healthInfoHandler.RegisterRoutes(protected)
+
+		// Medical Data routes
+		medicalDataHandler.RegisterRoutes(protected)
+
+   
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
@@ -49,17 +85,6 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	// Agrupa as rotas na versão 1 da API
-	api := router.Group("/api/v1")
-	{
-		// Rotas de autenticação e cadastro
-		users.UserRoutes(api, userService)
-
-		// Rotas de Health Information
-	healthInfoHandler.RegisterRoutes(api)
-
-		// Rotas de Medical Data
-		medicalDataHandler.RegisterRoutes(api)
 	}
 
 	// Inicia o servidor na porta 8080

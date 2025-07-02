@@ -68,34 +68,38 @@ func (u *userRepository) GetByEmail(email string) (*User, error) {
 
 // GetByEmailChangeCode implements Repository.
 func (u *userRepository) GetByEmailChangeCode(code string) (*User, error) {
-	if err := u.db.Where("email_change_code = ?", code).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("email_change_code = ?", code).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByEmailChangeCodeExpiresAt implements Repository.
 func (u *userRepository) GetByEmailChangeCodeExpiresAt(code string) (*User, error) {
-	if err := u.db.Where("email_change_code_expires_at = ?", code).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("email_change_code_expires_at = ?", code).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByEmailChangeCodeExpiresAtAndUsed implements Repository.
 func (u *userRepository) GetByEmailChangeCodeExpiresAtAndUsed(code string, used bool) (*User, error) {
-	if err := u.db.Where("email_change_code_expires_at = ? AND email_change_code_used = ?", code, used).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("email_change_code_expires_at = ? AND email_change_code_used = ?", code, used).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByEmailChangeCodeUsed implements Repository.
 func (u *userRepository) GetByEmailChangeCodeUsed(code string) (*User, error) {
-	if err := u.db.Where("email_change_code_used = ?", code).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("email_change_code_used = ?", code).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByEmailChangeCodeUsedAt implements Repository.

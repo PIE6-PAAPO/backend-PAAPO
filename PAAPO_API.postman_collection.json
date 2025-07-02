@@ -1,0 +1,300 @@
+{
+  "info": {
+    "name": "PAA2O API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for PAAPO API endpoints"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"yourpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Authenticate user and get access token"
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"user@example.com\",\n    \"password\": \"yourpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "Register a new user account"
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"token\": \"reset_token_here\",\n    \"password\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "reset-password"]
+            },
+            "description": "Reset user password with token"
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"user@example.com\",\n    \"code\": \"123456\",\n    \"newPassword\": \"newpassword\",\n    \"confirmPassword\": \"newpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/reset-password",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "reset-password"]
+            },
+            "description": "Reset password with code"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Information",
+      "item": [
+        {
+          "name": "Create Health Info",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"weight\": 70.5,\n    \"height\": 175.0,\n    \"smoker\": false,\n    \"alcohol_consumption\": \"occasional\",\n    \"physical_activity_frequency\": \"3-4 times a week\",\n    \"physical_activity_type\": \"Running, Swimming\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/health-info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health-info"]
+            },
+            "description": "Create new health information"
+          }
+        },
+        {
+          "name": "Get Health Info",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/health-info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health-info"]
+            },
+            "description": "Get user's health information"
+          }
+        },
+        {
+          "name": "Update Health Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"weight\": 72.0,\n    \"height\": 175.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/health-info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health-info"]
+            },
+            "description": "Update user's health information"
+          }
+        },
+        {
+          "name": "Delete Health Info",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/health-info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health-info"]
+            },
+            "description": "Delete user's health information"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Medical Data",
+      "item": [
+        {
+          "name": "Create Medical Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"diagnosis_date\": \"2023-01-15T00:00:00Z\",\n    \"surgery_date\": \"2023-02-01T00:00:00Z\",\n    \"surgery_type\": \"ACL Reconstruction\",\n    \"physiotherapy_referral\": true,\n    \"physiotherapy_duration\": \"2023-08-01T00:00:00Z\",\n    \"sufficient_recovery\": false,\n    \"present_sequela\": {\n        \"type\": \"pain\",\n        \"description\": \"Mild knee pain during activity\"\n    },\n    \"remaining_sequela\": {\n        \"type\": \"stiffness\",\n        \"description\": \"Morning stiffness\"\n    },\n    \"impact_on_daily_life\": \"Moderate impact on sports activities\",\n    \"affects_independence\": false,\n    \"post_surgery_activities\": \"Physical therapy 3x week, limited sports\",\n    \"medical_conditions\": [\"Hypertension\", \"Asthma\"],\n    \"other_diagnoses\": \"Mild osteoarthritis\",\n    \"medications\": \"Ibuprofen as needed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/medical-data",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "medical-data"]
+            },
+            "description": "Create new medical data"
+          }
+        },
+        {
+          "name": "Get Medical Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/medical-data",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "medical-data"]
+            },
+            "description": "Get user's medical data"
+          }
+        },
+        {
+          "name": "Update Medical Data",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"sufficient_recovery\": true,\n    \"post_surgery_activities\": \"Able to resume light jogging\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/medical-data",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "medical-data"]
+            },
+            "description": "Update user's medical data"
+          }
+        },
+        {
+          "name": "Delete Medical Data",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/medical-data",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "medical-data"]
+            },
+            "description": "Delete user's medical data"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

@@ -16,7 +16,6 @@ type RegisterDTO struct {
 	LastName  string `json:"last_name" binding:"required"`
 	Email     string `json:"email" binding:"required,email"`
 	Password  string `json:"password" binding:"required,min=8"`
-	CoverUrl  string `json:"cover_url" binding:"required"`
 }
 
 type ForgotPasswordDTO struct {

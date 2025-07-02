@@ -25,22 +25,43 @@ func (h *Handler) RegisterRoutes(router *gin.RouterGroup) {
 }
 
 func (h *Handler) CreateHealthInfo(c *gin.Context) {
+	// Log incoming request for debugging
+	c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	// Get user ID from context
 	userID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authenticated"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user not authenticated - missing userID in context"})
 		return
 	}
 
+	// Ensure userID is a string
+	userIDStr, ok := userID.(string)
+	if !ok || userIDStr == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid user ID format"})
+		return
+	}
+
+	// Parse request body
 	var dto CreateHealthInformationDTO
 	if err := c.ShouldBindJSON(&dto); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid request body",
+			"details": err.Error(),
+		})
 		return
 	}
 
-	dto.UserID = userID.(string)
+	// Set user ID from token
+	dto.UserID = userIDStr
+
+	// Create health info
 	healthInfo, err := h.service.CreateHealthInfo(dto)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create health information"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "failed to create health information",
+			"details": err.Error(),
+		})
 		return
 	}
 
