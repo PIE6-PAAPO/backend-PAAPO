@@ -8,6 +8,7 @@ import (
 
 	healthinfo "backend-PAAPO/internal/HealthInformation"
 	medicaldata "backend-PAAPO/internal/MedicalData"
+	trainingsession "backend-PAAPO/internal/TrainingSession"
 	"backend-PAAPO/internal/users"
 	"backend-PAAPO/pkg/database"
 	"backend-PAAPO/routes/middleware"
@@ -55,6 +56,11 @@ func main() {
 	medicalDataService := medicaldata.NewService(medicalDataRepo)
 	medicalDataHandler := medicaldata.NewHandler(medicalDataService)
 
+	// Training Session module
+	trainingSessionRepo := trainingsession.NewTrainingSessionRepository(db)
+	trainingSessionService := trainingsession.NewService(trainingSessionRepo)
+	trainingSessionHandler := trainingsession.NewHandler(trainingSessionService)
+
 	// Cria o router Gin com configurações padrão
 	router := gin.Default()
 
@@ -83,6 +89,9 @@ func main() {
 
 		// Medical Data routes
 		medicalDataHandler.RegisterRoutes(protected)
+
+		// Training Session routes
+		trainingSessionHandler.RegisterRoutes(protected)
 	}
 
 	// Inicia o servidor na porta 8080
