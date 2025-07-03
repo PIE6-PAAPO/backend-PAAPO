@@ -27,7 +27,7 @@ func (s *Service) CreateTrainingSession(userID string, dto dto.CreateTrainingSes
 	}
 
 	session := &models.TrainingSession{
-		ID:        uuid.New(),
+		ID:        uuid.New().String(),
 		UserID:    userID,
 		StartDate: dto.StartDate,
 		StartTime: dto.StartTime,

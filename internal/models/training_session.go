@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -16,7 +15,7 @@ const (
 )
 
 type TrainingSession struct {
-	ID          uuid.UUID             `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	ID          string                `gorm:"primaryKey" json:"id"`
 	UserID      string                `gorm:"not null" json:"user_id"`
 	StartDate   time.Time             `gorm:"not null" json:"start_date"`
 	StartTime   time.Time             `gorm:"not null" json:"start_time"`
