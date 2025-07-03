@@ -27,10 +27,16 @@ type Repository interface {
 	GetByEmailChangeCodeExpiresAtAndUsed(code string, used bool) (*User, error)
 	GetByEmailChangeCodeUsedAtAndExpiresAt(code string, used bool, expiresAt *time.Time) (*User, error)
 	CountByTestGroup(isTestGroup bool) (int64, error)
+	GetDB() *gorm.DB
 }
 
 func NewUserRepository(db *gorm.DB) Repository {
 	return &userRepository{db: db}
+}
+
+// GetDB returns the underlying database connection for transactions
+func (u *userRepository) GetDB() *gorm.DB {
+	return u.db
 }
 
 // Create implements Repository.

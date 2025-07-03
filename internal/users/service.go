@@ -129,22 +129,48 @@ func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
 		return nil, errors.New("erro ao gerar hash da senha")
 	}
 
-	// Criação do usuário
-	// Conta quantos usuários há em cada grupo
-	testCount, err := s.db.CountByTestGroup(true)
+	// Use atomic group assignment to prevent race conditions
+	newUser, err := s.createUserWithAtomicGroupAssignment(user, string(hashedPassword))
 	if err != nil {
+		return nil, err
+	}
+
+	return newUser, nil
+}
+
+// createUserWithAtomicGroupAssignment creates a user with atomic group assignment
+// to prevent race conditions during concurrent registrations
+func (s *Service) createUserWithAtomicGroupAssignment(user dto.RegisterDTO, hashedPassword string) (*User, error) {
+	// Start a database transaction
+	tx := s.db.GetDB().Begin()
+	if tx.Error != nil {
+		return nil, errors.New("erro ao iniciar transação")
+	}
+
+	// Defer rollback in case of error
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// Count users in each group within the transaction
+	var testCount, controlCount int64
+
+	if err := tx.Model(&User{}).Where("is_test_group = ?", true).Count(&testCount).Error; err != nil {
+		tx.Rollback()
 		return nil, errors.New("erro ao contar grupo de teste")
 	}
 
-	controlCount, err := s.db.CountByTestGroup(false)
-	if err != nil {
+	if err := tx.Model(&User{}).Where("is_test_group = ?", false).Count(&controlCount).Error; err != nil {
+		tx.Rollback()
 		return nil, errors.New("erro ao contar grupo de controle")
 	}
 
-	// Atribuição automática ao grupo
-	isTestGroup := controlCount > testCount
+	// Determine which group to assign (smaller group gets the new user)
+	isTestGroup := controlCount >= testCount
 
-	// Criação do usuário
+	// Create the user within the transaction
 	newUser := &User{
 		ID:            uuid.New(),
 		CreatedAt:     time.Now(),
@@ -152,18 +178,22 @@ func (s *Service) Register(user dto.RegisterDTO) (*User, error) {
 		FirstName:     user.FirstName,
 		LastName:      user.LastName,
 		Email:         user.Email,
-		Password:      string(hashedPassword),
-		Role:          string(models.Patient), // Default role
+		Password:      hashedPassword,
+		Role:          string(models.Patient),
 		IsActive:      true,
 		IsConfirmed:   false,
 		LastUsedEmail: user.Email,
-		IsTestGroup:   isTestGroup, // Aqui!
+		IsTestGroup:   isTestGroup,
 	}
 
-	// Salvar no repositório
-	newUser, err = s.db.Create(newUser)
-	if err != nil {
+	if err := tx.Create(newUser).Error; err != nil {
+		tx.Rollback()
 		return nil, errors.New("erro ao salvar usuário")
+	}
+
+	// Commit the transaction
+	if err := tx.Commit().Error; err != nil {
+		return nil, errors.New("erro ao confirmar transação")
 	}
 
 	return newUser, nil

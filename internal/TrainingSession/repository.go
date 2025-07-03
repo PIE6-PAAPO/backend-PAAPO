@@ -2,6 +2,7 @@ package trainingsession
 
 import (
 	"backend-PAAPO/internal/models"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -10,9 +11,16 @@ type Repository interface {
 	Create(session *models.TrainingSession) error
 	GetByID(id string) (*models.TrainingSession, error)
 	GetActiveByUserID(userID string) (*models.TrainingSession, error)
-	GetAllByUserID(userID string) ([]*models.TrainingSession, error)
+	GetAllByUserID(userID string, filters SessionFilters, page, limit int) ([]*models.TrainingSession, int64, error)
 	Update(session *models.TrainingSession) error
 	Delete(id string) error
+	FindAbandonedSessions(maxDurationHours int) ([]*models.TrainingSession, error)
+}
+
+type SessionFilters struct {
+	From     *time.Time
+	To       *time.Time
+	Category *string
 }
 
 type trainingSessionRepository struct {
@@ -48,13 +56,33 @@ func (r *trainingSessionRepository) GetActiveByUserID(userID string) (*models.Tr
 	return &session, nil
 }
 
-func (r *trainingSessionRepository) GetAllByUserID(userID string) ([]*models.TrainingSession, error) {
+func (r *trainingSessionRepository) GetAllByUserID(userID string, filters SessionFilters, page, limit int) ([]*models.TrainingSession, int64, error) {
 	var sessions []*models.TrainingSession
-	err := r.db.Where("user_id = ?", userID).Order("created_at DESC").Find(&sessions).Error
-	if err != nil {
-		return nil, err
+	var count int64
+	query := r.db.Model(&models.TrainingSession{}).Where("user_id = ?", userID)
+
+	if filters.From != nil {
+		query = query.Where("start_date >= ?", filters.From)
 	}
-	return sessions, nil
+	if filters.To != nil {
+		query = query.Where("start_date <= ?", filters.To)
+	}
+	if filters.Category != nil {
+		query = query.Where("category = ?", filters.Category)
+	}
+
+	query.Count(&count)
+
+	if page > 0 && limit > 0 {
+		offset := (page - 1) * limit
+		query = query.Offset(offset).Limit(limit)
+	}
+
+	err := query.Order("created_at DESC").Find(&sessions).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	return sessions, count, nil
 }
 
 func (r *trainingSessionRepository) Update(session *models.TrainingSession) error {
@@ -63,4 +91,14 @@ func (r *trainingSessionRepository) Update(session *models.TrainingSession) erro
 
 func (r *trainingSessionRepository) Delete(id string) error {
 	return r.db.Delete(&models.TrainingSession{}, id).Error
+}
+
+func (r *trainingSessionRepository) FindAbandonedSessions(maxDurationHours int) ([]*models.TrainingSession, error) {
+	var sessions []*models.TrainingSession
+	cutoff := time.Now().Add(-time.Duration(maxDurationHours) * time.Hour)
+	err := r.db.Where("status = ? AND start_time < ?", models.TrainingSessionActive, cutoff).Find(&sessions).Error
+	if err != nil {
+		return nil, err
+	}
+	return sessions, nil
 }
