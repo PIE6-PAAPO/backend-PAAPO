@@ -71,7 +71,9 @@ func (r *trainingSessionRepository) GetAllByUserID(userID string, filters Sessio
 		query = query.Where("category = ?", filters.Category)
 	}
 
-	query.Count(&count)
+	if err := query.Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
 
 	if page > 0 && limit > 0 {
 		offset := (page - 1) * limit
