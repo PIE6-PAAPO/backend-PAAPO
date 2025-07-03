@@ -16,9 +16,10 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=paapo
-      - JWT_SECRET=supersecretkey
+      - JWT_SECRET=your-super-secret-jwt-key-that-is-at-least-32-characters-long
       - MJ_APIKEY_PUBLIC=your_mailjet_public_key
       - MJ_APIKEY_PRIVATE=your_mailjet_private_key
+    restart: always
     networks:
       - paapo-network
 

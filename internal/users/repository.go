@@ -51,10 +51,11 @@ func (u *userRepository) Delete(id string) error {
 
 // GetByConfirmationCode implements Repository.
 func (u *userRepository) GetByConfirmationCode(code string) (*User, error) {
-	if err := u.db.Where("confirmation_code = ?", code).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("confirmation_code = ?", code).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByEmail implements Repository.
@@ -104,50 +105,56 @@ func (u *userRepository) GetByEmailChangeCodeUsed(code string) (*User, error) {
 
 // GetByEmailChangeCodeUsedAt implements Repository.
 func (u *userRepository) GetByEmailChangeCodeUsedAt(code string) (*User, error) {
-	if err := u.db.Where("email_change_code_used_at = ?", code).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("email_change_code_used_at = ?", code).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByEmailChangeCodeUsedAtAndExpiresAt implements Repository.
 func (u *userRepository) GetByEmailChangeCodeUsedAtAndExpiresAt(code string, used bool, expiresAt *time.Time) (*User, error) {
-	if err := u.db.Where("email_change_code_used_at = ? AND email_change_code_expires_at = ?", code, expiresAt).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("email_change_code_used_at = ? AND email_change_code_expires_at = ?", code, expiresAt).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByEmailChangeCodeUsedAtAndUsed implements Repository.
 func (u *userRepository) GetByEmailChangeCodeUsedAtAndUsed(code string, used bool) (*User, error) {
-	if err := u.db.Where("email_change_code_used_at = ? AND email_change_code_used = ?", code, used).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("email_change_code_used_at = ? AND email_change_code_used = ?", code, used).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetById implements Repository.
 func (u *userRepository) GetById(id string) (*User, error) {
-	if err := u.db.Where("id = ?", id).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByProvider implements Repository.
 func (u *userRepository) GetByProvider(provider string, providerId string) (*User, error) {
-	if err := u.db.Where("provider = ? AND provider_id = ?", provider, providerId).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("provider = ? AND provider_id = ?", provider, providerId).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // GetByRecoveryCode implements Repository.
 func (u *userRepository) GetByRecoveryCode(code string) (*User, error) {
-	if err := u.db.Where("recovery_code = ?", code).First(&User{}).Error; err != nil {
+	var user User
+	if err := u.db.Where("recovery_code = ?", code).First(&user).Error; err != nil {
 		return nil, err
 	}
-	return &User{}, nil
+	return &user, nil
 }
 
 // Update implements Repository.

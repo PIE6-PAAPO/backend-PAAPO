@@ -20,12 +20,21 @@ func ConnectDB() (*gorm.DB, error) {
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
 
+	// Set defaults if not provided
 	if host == "" {
 		host = "localhost"
+	}
+	if port == "" {
 		port = "5432"
+	}
+	if user == "" {
 		user = "postgres"
-		password = "senha"
-		dbname = "meubanco"
+	}
+	if password == "" {
+		password = "postgres"
+	}
+	if dbname == "" {
+		dbname = "paapo"
 	}
 
 	dsn := fmt.Sprintf(
