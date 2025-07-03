@@ -87,10 +87,6 @@ A maioria dos endpoints requer um token JWT. Registre-se e faça login para obte
 - Novos usuários são automaticamente distribuídos entre Grupo 1 e Grupo 2 para manter o equilíbrio.
 - A diferença entre os grupos nunca será maior que 1.
 
-## 🧪 Testes e Scripts Úteis
-- **test_group_assignment.sh** — Testa o balanceamento de grupos
-- **check_group_distribution.sh** — Mostra a distribuição atual dos grupos no banco
-
 ## 💡 Dicas para Estagiários
 - Sempre leia os exemplos de requisição e resposta.
 - Use ferramentas como Postman ou Insomnia para testar os endpoints.
