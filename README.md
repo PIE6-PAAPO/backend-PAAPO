@@ -87,11 +87,9 @@ A maioria dos endpoints requer um token JWT. Registre-se e faça login para obte
 - Novos usuários são automaticamente distribuídos entre Grupo 1 e Grupo 2 para manter o equilíbrio.
 - A diferença entre os grupos nunca será maior que 1.
 
-## 💡 Dicas para Estagiários
-- Sempre leia os exemplos de requisição e resposta.
+## 💡 Dicas
 - Use ferramentas como Postman ou Insomnia para testar os endpoints.
 - Tokens JWT devem ser enviados no header: `Authorization: Bearer <token>`
-- Se tiver dúvidas, pergunte! O código está documentado e a equipe está pronta para ajudar.
 
 ## 👨‍💻 Contribuindo
 - Faça um fork, crie uma branch e envie seu PR.
