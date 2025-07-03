@@ -96,7 +96,7 @@ func (s *Service) FlagAbandonedSessions() error {
 		session.Status = models.TrainingSessionInterrupted
 		session.Interrupted = true
 		session.UpdatedAt = time.Now()
-		dur := int64(time.Now().Sub(session.StartTime).Seconds())
+		dur := int64(time.Since(session.StartTime).Seconds())
 		session.Duration = &dur
 		s.repo.Update(session)
 	}

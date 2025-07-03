@@ -8,7 +8,7 @@ import (
 
 	healthinfo "backend-PAAPO/internal/HealthInformation"
 	medicaldata "backend-PAAPO/internal/MedicalData"
-	trainingsession "backend-PAAPO/internal/TrainingSession"
+	trainingsession "backend-PAAPO/internal/trainingsession"
 	"backend-PAAPO/internal/users"
 	"backend-PAAPO/pkg/database"
 	"backend-PAAPO/routes/middleware"
