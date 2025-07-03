@@ -7,6 +7,7 @@ import (
 
 	healthinfo "backend-PAAPO/internal/HealthInformation"
 	medicaldata "backend-PAAPO/internal/MedicalData"
+	"backend-PAAPO/internal/models"
 	"backend-PAAPO/internal/users"
 
 	"gorm.io/driver/postgres"
@@ -52,6 +53,7 @@ func ConnectDB() (*gorm.DB, error) {
 		&users.User{},
 		&healthinfo.HealthInformation{},
 		&medicaldata.MedicalData{},
+		&models.TrainingSession{},
 	); err != nil {
 		return nil, fmt.Errorf("migration failed: %w", err)
 	}

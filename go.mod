@@ -8,6 +8,7 @@ require (
 	github.com/mailjet/mailjet-apiv3-go/v4 v4.0.7
 	golang.org/x/crypto v0.39.0
 	gorm.io/datatypes v1.2.5
+	gorm.io/driver/sqlite v1.4.3
 )
 
 require (
@@ -27,6 +28,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
