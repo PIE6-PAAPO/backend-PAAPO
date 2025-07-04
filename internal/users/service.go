@@ -343,3 +343,50 @@ func CreateUserWithGroupAssignment(repo Repository, user *User) (*User, error) {
 
 	return repo.Create(user)
 }
+
+func (s *Service) EnsureDefaultAdmin() {
+	email := os.Getenv("DEFAULT_ADMIN_EMAIL")
+	password := os.Getenv("DEFAULT_ADMIN_PASSWORD")
+	if email == "" || password == "" {
+		log.Println("[DefaultAdmin] DEFAULT_ADMIN_EMAIL or DEFAULT_ADMIN_PASSWORD not set. Skipping default admin creation.")
+		return
+	}
+
+	adminCount, err := s.db.CountByRole(string(models.Admin))
+	if err != nil {
+		log.Printf("[DefaultAdmin] Error checking for existing admin: %v\n", err)
+		return
+	}
+	if adminCount > 0 {
+		log.Println("[DefaultAdmin] Admin user already exists. Skipping default admin creation.")
+		return
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("[DefaultAdmin] Error hashing admin password: %v\n", err)
+		return
+	}
+
+	adminUser := &User{
+		ID:            uuid.New(),
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+		FirstName:     "Admin",
+		LastName:      "User",
+		Email:         email,
+		Password:      string(hashedPassword),
+		Role:          string(models.Admin),
+		IsActive:      true,
+		IsConfirmed:   true,
+		LastUsedEmail: email,
+		IsTestGroup:   false,
+	}
+
+	_, err = s.db.Create(adminUser)
+	if err != nil {
+		log.Printf("[DefaultAdmin] Error creating default admin: %v\n", err)
+		return
+	}
+	log.Printf("[DefaultAdmin] Default admin user created: %s\n", email)
+}

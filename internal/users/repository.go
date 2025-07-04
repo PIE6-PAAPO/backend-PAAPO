@@ -27,6 +27,7 @@ type Repository interface {
 	GetByEmailChangeCodeExpiresAtAndUsed(code string, used bool) (*User, error)
 	GetByEmailChangeCodeUsedAtAndExpiresAt(code string, used bool, expiresAt *time.Time) (*User, error)
 	CountByTestGroup(isTestGroup bool) (int64, error)
+	CountByRole(role string) (int64, error)
 	GetDB() *gorm.DB
 }
 
@@ -176,6 +177,16 @@ func (u *userRepository) CountByTestGroup(isTestGroup bool) (int64, error) {
 	err := u.db.
 		Model(&User{}).
 		Where("is_test_group = ?", isTestGroup).
+		Count(&count).Error
+
+	return count, err
+}
+
+func (u *userRepository) CountByRole(role string) (int64, error) {
+	var count int64
+	err := u.db.
+		Model(&User{}).
+		Where("role = ?", role).
 		Count(&count).Error
 
 	return count, err

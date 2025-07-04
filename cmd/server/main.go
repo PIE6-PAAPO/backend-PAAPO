@@ -48,6 +48,9 @@ func main() {
 	userRepository := users.NewUserRepository(db)
 	userService := users.NewService(userRepository)
 
+	// Ensure default admin user exists (runs once at startup)
+	userService.EnsureDefaultAdmin()
+
 	healthInfoRepo := healthinfo.NewHealthInformationRepository(db)
 	healthInfoService := healthinfo.NewService(healthInfoRepo)
 	healthInfoHandler := healthinfo.NewHandler(healthInfoService)

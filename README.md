@@ -95,6 +95,20 @@ A maioria dos endpoints requer um token JWT. Registre-se e faça login para obte
 - Faça um fork, crie uma branch e envie seu PR.
 - Siga o padrão de código e escreva comentários claros.
 
+## Variáveis de Ambiente
+
+Além das variáveis já existentes, agora é possível criar automaticamente um usuário admin padrão ao iniciar o backend. Para isso, defina as seguintes variáveis de ambiente:
+
+- `DEFAULT_ADMIN_EMAIL`: Email do admin padrão (ex: admin@paapo.com.br)
+- `DEFAULT_ADMIN_PASSWORD`: Senha do admin padrão (ex: admin123)
+
+**Comportamento:**
+- Se ambas estiverem definidas, o sistema irá criar um usuário admin automaticamente na primeira inicialização, caso ainda não exista nenhum admin.
+- Se já houver um admin, nada será feito.
+- Se alguma das variáveis não estiver definida, a criação do admin será ignorada.
+
+Você pode definir essas variáveis no seu `.env`, diretamente no ambiente, ou no bloco `environment` do `docker-compose.yml` (veja exemplo comentado lá).
+
 ---
 
 **Dúvidas?**
