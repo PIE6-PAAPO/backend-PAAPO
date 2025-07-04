@@ -283,6 +283,181 @@
           }
         }
       ]
+    },
+    {
+      "name": "Training Sessions",
+      "item": [
+        {
+          "name": "Start Training Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"start_date\": \"2025-07-02T14:00:00Z\",\n  \"start_time\": \"2025-07-02T14:00:00Z\",\n  \"category\": \"reading\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/training-sessions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "training-sessions"]
+            },
+            "description": "Start a new training session for the authenticated user."
+          }
+        },
+        {
+          "name": "End Training Session",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comments\": \"Session finished successfully!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/training-sessions/end",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "training-sessions", "end"]
+            },
+            "description": "End the current active training session."
+          }
+        },
+        {
+          "name": "List Training Sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/training-sessions?from=2025-07-01T00:00:00Z&to=2025-07-31T23:59:59Z&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "training-sessions"],
+              "query": [
+                { "key": "from", "value": "2025-07-01T00:00:00Z" },
+                { "key": "to", "value": "2025-07-31T23:59:59Z" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "List all training sessions for the authenticated user, with optional filters."
+          }
+        },
+        {
+          "name": "Get Active Training Session",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/training-sessions/active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "training-sessions", "active"]
+            },
+            "description": "Get the current active training session for the user."
+          }
+        },
+        {
+          "name": "Get Active Session (Alias)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/session/active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "session", "active"]
+            },
+            "description": "Alias for getting the current active training session."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Session Reports",
+      "item": [
+        {
+          "name": "List Sessions (Report)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/sessions?from=2025-07-01T00:00:00Z&to=2025-07-31T23:59:59Z&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sessions"],
+              "query": [
+                { "key": "from", "value": "2025-07-01T00:00:00Z" },
+                { "key": "to", "value": "2025-07-31T23:59:59Z" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "List sessions with filters and pagination (reporting)."
+          }
+        },
+        {
+          "name": "Total Hours Trained",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/sessions/total-hours?from=2025-07-01T00:00:00Z&to=2025-07-31T23:59:59Z",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sessions", "total-hours"],
+              "query": [
+                { "key": "from", "value": "2025-07-01T00:00:00Z" },
+                { "key": "to", "value": "2025-07-31T23:59:59Z" }
+              ]
+            },
+            "description": "Get the total hours trained in a period."
+          }
+        },
+        {
+          "name": "Average Session Duration",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/sessions/average-duration?from=2025-07-01T00:00:00Z&to=2025-07-31T23:59:59Z",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sessions", "average-duration"],
+              "query": [
+                { "key": "from", "value": "2025-07-01T00:00:00Z" },
+                { "key": "to", "value": "2025-07-31T23:59:59Z" }
+              ]
+            },
+            "description": "Get the average session duration in minutes for a period."
+          }
+        },
+        {
+          "name": "Session Count Per Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/sessions/category-count",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "sessions", "category-count"]
+            },
+            "description": "Get the count of sessions per category."
+          }
+        }
+      ]
     }
   ],
   "variable": [
